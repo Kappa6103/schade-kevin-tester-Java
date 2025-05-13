@@ -11,15 +11,15 @@ public class DataBaseConfig {
 
     public Connection getConnection() throws ClassNotFoundException, SQLException {
         logger.info("Create DB connection");
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(
+        Class.forName("com.mysql.cj.jdbc.Driver"); //loading the Driver class with the right init calls
+        return DriverManager.getConnection( //connecting with the DB address and login
                 "jdbc:mysql://localhost:3306/prod","root","rootroot");
     }
 
     public void closeConnection(Connection con){
         if(con!=null){
             try {
-                con.close();
+                con.close(); // ?? commit before close maybe ??
                 logger.info("Closing DB connection");
             } catch (SQLException e) {
                 logger.error("Error while closing connection",e);

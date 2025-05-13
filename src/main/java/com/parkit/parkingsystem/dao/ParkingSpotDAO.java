@@ -25,11 +25,11 @@ public class ParkingSpotDAO {
             ps.setString(1, parkingType.toString());
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
-                result = rs.getInt(1);;
+                result = rs.getInt(1); //removing one comma
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
-        }catch (Exception ex){
+        }catch (Exception ex){ // more like a SQLException ? no ?
             logger.error("Error fetching next available slot",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
@@ -38,7 +38,7 @@ public class ParkingSpotDAO {
     }
 
     public boolean updateParking(ParkingSpot parkingSpot){
-        //update the availability fo that parking slot
+        //update the availability for that parking slot
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
