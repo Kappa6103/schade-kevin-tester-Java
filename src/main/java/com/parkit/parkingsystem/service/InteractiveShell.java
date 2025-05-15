@@ -19,7 +19,7 @@ public class InteractiveShell {
         ParkingSpotDAO parkingSpotDAO = new ParkingSpotDAO();
         TicketDAO ticketDAO = new TicketDAO();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
+        
         while(continueApp){
             loadMenu();
             int option = inputReaderUtil.readSelection();

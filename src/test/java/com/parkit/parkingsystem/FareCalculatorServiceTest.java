@@ -9,7 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+//import static org.assertj.core.api.Assertions.assertThat; to have -> assertThat(somme).isEqualTo(5);
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Date;
@@ -159,6 +160,42 @@ public class FareCalculatorServiceTest {
 
 		// Assert
 		assertEquals(0, ticket.getPrice());
+    }
+    
+    @Test //Step 4
+    public void calculateFareCarWithDiscount() {
+		// Arrange
+		Date inTime = new Date();
+		inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000)); // 60 mins parking time
+		Date outTime = new Date();
+		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        
+		// Act
+        fareCalculatorService.calculateFare(ticket, true);
+
+		// Assert
+		assertEquals(Fare.CAR_RATE_PER_HOUR * Fare.DISCOUNT , ticket.getPrice());
+    }
+    
+    @Test //Step 4
+    public void calculateFareBikeWithDiscount() {
+		// Arrange
+		Date inTime = new Date();
+		inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000)); // 60 mins parking time
+		Date outTime = new Date();
+		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        
+		// Act
+        fareCalculatorService.calculateFare(ticket, true);
+
+		// Assert
+		assertEquals(Fare.BIKE_RATE_PER_HOUR * Fare.DISCOUNT , ticket.getPrice());
     }
 
 }

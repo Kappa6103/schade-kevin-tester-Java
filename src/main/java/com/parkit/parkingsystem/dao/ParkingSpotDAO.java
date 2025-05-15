@@ -11,6 +11,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+ /*DATA ACCES OBJECT DDB -> OBJ JAVA
+ *  It's a very common and fundamental design pattern used to abstract 
+ *  and encapsulate all access to the data source of an application.
+ *  
+ * Think of a DAO as a dedicated component responsible for interacting with your database 
+ * (or any other persistent storage mechanism like a file, a web service, etc.)
+ * on behalf of other parts of your application.
+ */
 public class ParkingSpotDAO {
     private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
 
