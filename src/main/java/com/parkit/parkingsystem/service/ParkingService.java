@@ -51,8 +51,10 @@ public class ParkingService {
                 			+ "vous allez obtenir une remise de 5 %");
                 }
                 System.out.println("Generated Ticket and saved in DB");
-                System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
-                System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime);
+                System.out.println("Please park your vehicle in spot number:"
+                +parkingSpot.getId());
+                System.out.println("Recorded in-time for vehicle number:"
+                +vehicleRegNumber+" is:"+inTime);
             }
         }catch(Exception e){
             logger.error("Unable to process incoming vehicle",e);
@@ -73,7 +75,8 @@ public class ParkingService {
             if(parkingNumber > 0){
                 parkingSpot = new ParkingSpot(parkingNumber,parkingType, true);
             }else{
-                throw new Exception("Error fetching parking number from DB. Parking slots might be full");
+                throw new Exception("Error fetching parking number from DB."
+                		+ " Parking slots might be full");
             }
         }catch(IllegalArgumentException ie){
             logger.error("Error parsing user input for type of vehicle", ie);
@@ -109,7 +112,7 @@ public class ParkingService {
             Date outTime = new Date();
             ticket.setOutTime(outTime);
             // step 4 
-            if (ticketDAO.getNbTicket(vehicleRegNumber) > 0 ) {
+            if (ticketDAO.getNbTicket(vehicleRegNumber) > 1 ) {
             	fareCalculatorService.calculateFare(ticket, true);
             } else {
             	fareCalculatorService.calculateFare(ticket);
