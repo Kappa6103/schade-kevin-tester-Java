@@ -6,7 +6,6 @@ import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,6 @@ import java.util.Date;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -33,23 +31,21 @@ public class ParkingServiceTest {
 	
     private ParkingService parkingServiceUnderTest; //adding "underTest" to clarify
     
-    private Ticket ticket; //ticket should not be mock
+    private Ticket ticket; //ticket should not be mocked - pojo
     
-    private ParkingSpot parkingSpot;
+    private ParkingSpot parkingSpot; //parkingSpot should not be mocked - pojo
     
+    final String vehiculeRegNumber = "ABCDEF";
     //adding "mock%" to mocked variables
     @Mock
     private InputReaderUtil mockInputReaderUtil;
     @Mock
     private ParkingSpotDAO mockParkingSpotDAO;
     @Mock
-    private TicketDAO mockTicketDAO;
-    @Mock
-    private FareCalculatorService mockFareCalculatorService; //adding mock farecalculatorservice
-   
+    private TicketDAO mockTicketDAO;   
     
     @BeforeEach
-    private void setUpPerTest() {
+    public void setUpPerTest() {
         try {        	        	
         	//Instantiating the class to test
             parkingServiceUnderTest = new ParkingService(mockInputReaderUtil, mockParkingSpotDAO, mockTicketDAO);
@@ -63,21 +59,20 @@ public class ParkingServiceTest {
     @Test
     public void processExitingVehicleTest() {
     	// Arrange
-		String vehiculeRegNumber = "ABCDEF";
+
     	//setting up pojo objects
     	parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
     	ticket = new Ticket();
     	ticket.setParkingSpot(parkingSpot);
-    	ticket.setVehicleRegNumber("ABCDEF");
+    	ticket.setVehicleRegNumber(vehiculeRegNumber);
     	ticket.setInTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000)); // 1 hour ago
 		try {
 
 			when(mockTicketDAO.getNbTicket(vehiculeRegNumber)).thenReturn(1);// first time user
 			when(mockParkingSpotDAO.updateParking(any())).thenReturn(true);
-			when(mockTicketDAO.updateTicket(ticket)).thenReturn(true);
-			when(mockParkingSpotDAO.updateParking(any())).thenReturn(true);			
-			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-			when(mockTicketDAO.getTicket("ABCDEF")).thenReturn(ticket);
+			when(mockTicketDAO.updateTicket(ticket)).thenReturn(true);			
+			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehiculeRegNumber);
+			when(mockTicketDAO.getTicket(vehiculeRegNumber)).thenReturn(ticket);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Failed to set up test mock objects - "
@@ -105,15 +100,13 @@ public class ParkingServiceTest {
        	parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
        	ticket = new Ticket();
        	ticket.setParkingSpot(parkingSpot);
-       	ticket.setVehicleRegNumber("ABCDEF");
+       	ticket.setVehicleRegNumber(vehiculeRegNumber);
        	ticket.setInTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000)); // 1 hour ago
        	try {
-
-			String vehiculeRegNumber = "ABCDEF";
 			when(mockTicketDAO.getNbTicket(vehiculeRegNumber)).thenReturn(1); // first time user
 			when(mockTicketDAO.updateTicket(ticket)).thenReturn(false); // simulating error while updating
-			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-			when(mockTicketDAO.getTicket("ABCDEF")).thenReturn(ticket);
+			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehiculeRegNumber);
+			when(mockTicketDAO.getTicket(vehiculeRegNumber)).thenReturn(ticket);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Failed to set up test mock objects - "
@@ -146,9 +139,9 @@ public class ParkingServiceTest {
     	try {
 			when(mockInputReaderUtil.readSelection()).thenReturn(1); // car
 			when(mockParkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
-			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehiculeRegNumber);
 			when(mockParkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
-			when(mockTicketDAO.getNbTicket("ABCDEF")).thenReturn(1);
+			when(mockTicketDAO.getNbTicket(vehiculeRegNumber)).thenReturn(1);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Failed to set up test mock objects - "
@@ -174,7 +167,7 @@ public class ParkingServiceTest {
         verify(mockTicketDAO).saveTicket(ticketCaptor.capture());
         
         Ticket savedTicket = ticketCaptor.getValue();
-        assertEquals("ABCDEF", savedTicket.getVehicleRegNumber());
+        assertEquals(vehiculeRegNumber, savedTicket.getVehicleRegNumber());
         assertEquals(1, savedTicket.getParkingSpot().getId());
         assertEquals(ParkingType.CAR, savedTicket.getParkingSpot().getParkingType());
         assertEquals(0, savedTicket.getPrice());
