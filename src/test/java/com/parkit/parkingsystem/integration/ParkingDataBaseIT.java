@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.integration;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
@@ -11,6 +12,7 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -22,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,10 +36,13 @@ public class ParkingDataBaseIT {
     private static TicketDAO ticketDAO;
     private static DataBasePrepareService dataBasePrepareService;
     
-    final String vehiculeRegNumber = "ABCDEF";
+    final String vehicleRegNumber = "ABCDEF";
 
     @Mock
     public InputReaderUtil mockInputReaderUtil;
+    
+    @Mock
+    public TicketDAO mockTicketDAO;
 
     @BeforeAll
     public static void setUp() throws Exception {
@@ -49,13 +56,14 @@ public class ParkingDataBaseIT {
     @BeforeEach
     void setUpPerTest() throws Exception {
         when(mockInputReaderUtil.readSelection()).thenReturn(1);
-        when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehiculeRegNumber);
+        when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehicleRegNumber);
         dataBasePrepareService.clearDataBaseEntries();
 
     }
 
     @AfterAll
     public static void tearDown() {
+        dataBasePrepareService.clearDataBaseEntries();
 
     }
 
@@ -63,43 +71,75 @@ public class ParkingDataBaseIT {
     public void testParkingACar() {
     	//Arrange
         ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
-        
+
         //Act
         parkingService.processIncomingVehicle();
-        Ticket ticket = ticketDAO.getTicket(vehiculeRegNumber);
+        Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
         ParkingSpot parkingSpot = ticket.getParkingSpot();
 
         //Assert
         //TODO: check that a ticket is actually saved in DB and Parking table is updated with availability
         assertNotNull(ticket);
         assertNotNull(parkingSpot);
-        assertEquals(vehiculeRegNumber, ticket.getVehicleRegNumber());
+        assertEquals(vehicleRegNumber, ticket.getVehicleRegNumber());
         assertFalse(parkingSpot.isAvailable());
     }
 
     @Test
+    //@Disabled
     public void testParkingLotExit() {
         //Arrange
     	testParkingACar();
     	ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
-    	Ticket ticket;
     	boolean farePopulated;
+    	Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
+    	ticket.setInTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000));
+    	ticketDAO.updateTicket(ticket);
     	
     	//Act
-        ticket = ticketDAO.getTicket(vehiculeRegNumber);
-        ticket.setInTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000));
-        ticketDAO.updateTicket(ticket);
         parkingService.processExitingVehicle();
-        ticket = ticketDAO.getTicket(vehiculeRegNumber);
+        ticket = ticketDAO.getTicket(vehicleRegNumber);
         farePopulated = ticket.getPrice() > 0;
         
         //Assert
         //TODO: check that the fare generated and out time are populated correctly in the database
         assertNotNull(ticket.getOutTime(), "ticket.getOutTime() asserted not nul");
-        assertTrue(farePopulated, "fare asserted > 0");
-        
-        
-        
+        assertTrue(farePopulated, "fare asserted > 0");        
+    }
+    
+    /*
+     * Ajoutez un nouveau test d’intégration pour la fonctionnalité de remise de 5 % : 
+     * testParkingLotExitRecurringUser. Il doit tester le calcul du prix d’un ticket via 
+     * l’appel de processIncomingVehicleetprocessExitingVehicledans le cas d’un utilisateur récurrent.
+     */
+    
+    @Test
+    public void testParkingLotExitRecurringUser() {
+    	//Arrange
+    	ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
+    	testParkingACar();
+        System.out.println("<<<>>>>>" + ticketDAO.getNbTicket(vehicleRegNumber));
+    	testParkingACar();
+        System.out.println("<<<>>>>>" + ticketDAO.getNbTicket(vehicleRegNumber));
+
+    	Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
+    	ticket.setInTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000));
+    	ticketDAO.updateTicket(ticket);
+
+    	//Act
+    	parkingService.processExitingVehicle();
+    	ticket = ticketDAO.getTicket(vehicleRegNumber);
+
+    	//Assert
+    	BigDecimal ticketWithDiscount = BigDecimal.valueOf(Fare.CAR_RATE_PER_HOUR * Fare.DISCOUNT)
+    			.setScale(2, RoundingMode.HALF_UP);
+    	BigDecimal testTicket = BigDecimal.valueOf(ticket.getPrice())
+    			.setScale(2, RoundingMode.HALF_UP);
+    	
+    	assertTrue(ticketDAO.getNbTicket(vehicleRegNumber) > 1, "asserted .getNbTicket > 1");
+    	assertEquals(ticketWithDiscount, testTicket);
+    	System.out.println(">>>>>>>NUMBER OF TICKETS = " +ticketDAO.getNbTicket(vehicleRegNumber));
+
     }
 
 }
