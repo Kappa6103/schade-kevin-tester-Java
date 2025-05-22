@@ -1,6 +1,9 @@
 package com.parkit.parkingsystem.service;
 
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
@@ -10,13 +13,19 @@ public class FareCalculatorService {
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
-        //changing the type from int to long & removing the .getHours() methodes to put .getTime();
         long inHour = ticket.getInTime().getTime();
         long outHour = ticket.getOutTime().getTime();
-        //TODO: Some tests are failing here. Need to check if this logic is correct
         //minutes = milliseconds / 60000
-        double duration = (double) ((outHour - inHour) / (1000 * 60)) / 60; // doesnt work for less than an hour
-
+        long diffInMilliseconds = outHour - inHour;
+        //duration in hours 1.0 format for 60mins format
+        double formatingDuration = (double) ((diffInMilliseconds) / (1000.0 * 60)) / 60;
+        //rounding up to 2 decimal
+        double duration = BigDecimal
+        		.valueOf(formatingDuration)
+        		.setScale(2, RoundingMode.HALF_UP)
+        		.doubleValue();
+        System.out.println(" <<><><><%%%% " + duration);
+        
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
             	if (duration > 0.5 && !discount) {

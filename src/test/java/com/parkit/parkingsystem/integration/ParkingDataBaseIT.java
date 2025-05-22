@@ -66,6 +66,11 @@ public class ParkingDataBaseIT {
         dataBasePrepareService.clearDataBaseEntries();
 
     }
+    
+    public void parkACar() {
+        ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
+        parkingService.processIncomingVehicle();
+    }
 
     @Test
     public void testParkingACar() {
@@ -86,10 +91,9 @@ public class ParkingDataBaseIT {
     }
 
     @Test
-    //@Disabled
     public void testParkingLotExit() {
         //Arrange
-    	testParkingACar();
+    	parkACar();
     	ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
     	boolean farePopulated;
     	Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
@@ -117,9 +121,9 @@ public class ParkingDataBaseIT {
     public void testParkingLotExitRecurringUser() {
     	//Arrange
     	ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
-    	testParkingACar();
+    	parkACar();
         System.out.println("<<<>>>>>" + ticketDAO.getNbTicket(vehicleRegNumber));
-    	testParkingACar();
+    	parkACar();
         System.out.println("<<<>>>>>" + ticketDAO.getNbTicket(vehicleRegNumber));
 
     	Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
@@ -129,16 +133,17 @@ public class ParkingDataBaseIT {
     	//Act
     	parkingService.processExitingVehicle();
     	ticket = ticketDAO.getTicket(vehicleRegNumber);
-
+    	// parfois un peu plus d'une heure. rentrer manuellement dans la ddb pour set la value of exit time
     	//Assert
     	BigDecimal ticketWithDiscount = BigDecimal.valueOf(Fare.CAR_RATE_PER_HOUR * Fare.DISCOUNT)
     			.setScale(2, RoundingMode.HALF_UP);
     	BigDecimal testTicket = BigDecimal.valueOf(ticket.getPrice())
     			.setScale(2, RoundingMode.HALF_UP);
     	
+    	assertNotNull(ticket);
     	assertTrue(ticketDAO.getNbTicket(vehicleRegNumber) > 1, "asserted .getNbTicket > 1");
     	assertEquals(ticketWithDiscount, testTicket);
-    	System.out.println(">>>>>>>NUMBER OF TICKETS = " +ticketDAO.getNbTicket(vehicleRegNumber));
+    	System.out.println(">>>>>>>NUMBER OF TICKETS = " + ticketDAO.getNbTicket(vehicleRegNumber));
 
     }
 
