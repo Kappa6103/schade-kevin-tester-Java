@@ -24,7 +24,6 @@ public class FareCalculatorService {
         		.valueOf(formatingDuration)
         		.setScale(2, RoundingMode.HALF_UP)
         		.doubleValue();
-        System.out.println(" <<><><><%%%% " + duration);
         
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {

@@ -140,7 +140,36 @@
                     </execution>
                 </executions>
             </plugin>
+			 <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>4.0.0-M12</version>
+    		</plugin>
         </plugins>
     </build>
+    
+    <reporting>
+  <plugins>
+    <!-- JaCoCo Report Plugin -->
+    <plugin>
+      <groupId>org.jacoco</groupId>
+      <artifactId>jacoco-maven-plugin</artifactId>
+      <version>0.8.5</version> <!-- Adjust if needed -->
+      <reportSets>
+        <reportSet>
+          <reports>
+            <report>report</report>
+          </reports>
+        </reportSet>
+      </reportSets>
+    </plugin>
 
+    <!-- Surefire Report Plugin -->
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-report-plugin</artifactId>
+      <version>3.0.0-M5</version> <!-- Use latest stable -->
+    </plugin>
+  </plugins>
+</reporting>
 </project>

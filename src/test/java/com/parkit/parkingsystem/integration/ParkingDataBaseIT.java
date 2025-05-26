@@ -58,13 +58,11 @@ public class ParkingDataBaseIT {
         when(mockInputReaderUtil.readSelection()).thenReturn(1);
         when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehicleRegNumber);
         dataBasePrepareService.clearDataBaseEntries();
-
     }
 
     @AfterAll
     public static void tearDown() {
         dataBasePrepareService.clearDataBaseEntries();
-
     }
     
     public void parkACar() {
@@ -83,7 +81,6 @@ public class ParkingDataBaseIT {
         ParkingSpot parkingSpot = ticket.getParkingSpot();
 
         //Assert
-        //TODO: check that a ticket is actually saved in DB and Parking table is updated with availability
         assertNotNull(ticket);
         assertNotNull(parkingSpot);
         assertEquals(vehicleRegNumber, ticket.getVehicleRegNumber());
@@ -110,22 +107,13 @@ public class ParkingDataBaseIT {
         assertNotNull(ticket.getOutTime(), "ticket.getOutTime() asserted not nul");
         assertTrue(farePopulated, "fare asserted > 0");        
     }
-    
-    /*
-     * Ajoutez un nouveau test d’intégration pour la fonctionnalité de remise de 5 % : 
-     * testParkingLotExitRecurringUser. Il doit tester le calcul du prix d’un ticket via 
-     * l’appel de processIncomingVehicleetprocessExitingVehicledans le cas d’un utilisateur récurrent.
-     */
-    
+        
     @Test
     public void testParkingLotExitRecurringUser() {
     	//Arrange
     	ParkingService parkingService = new ParkingService(mockInputReaderUtil, parkingSpotDAO, ticketDAO);
     	parkACar();
-        System.out.println("<<<>>>>>" + ticketDAO.getNbTicket(vehicleRegNumber));
     	parkACar();
-        System.out.println("<<<>>>>>" + ticketDAO.getNbTicket(vehicleRegNumber));
-
     	Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
     	ticket.setInTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000));
     	ticketDAO.updateTicket(ticket);
@@ -133,7 +121,7 @@ public class ParkingDataBaseIT {
     	//Act
     	parkingService.processExitingVehicle();
     	ticket = ticketDAO.getTicket(vehicleRegNumber);
-    	// parfois un peu plus d'une heure. rentrer manuellement dans la ddb pour set la value of exit time
+    	
     	//Assert
     	BigDecimal ticketWithDiscount = BigDecimal.valueOf(Fare.CAR_RATE_PER_HOUR * Fare.DISCOUNT)
     			.setScale(2, RoundingMode.HALF_UP);
@@ -143,8 +131,5 @@ public class ParkingDataBaseIT {
     	assertNotNull(ticket);
     	assertTrue(ticketDAO.getNbTicket(vehicleRegNumber) > 1, "asserted .getNbTicket > 1");
     	assertEquals(ticketWithDiscount, testTicket);
-    	System.out.println(">>>>>>>NUMBER OF TICKETS = " + ticketDAO.getNbTicket(vehicleRegNumber));
-
     }
-
 }

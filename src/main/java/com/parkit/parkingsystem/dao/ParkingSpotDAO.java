@@ -26,7 +26,7 @@ public class ParkingSpotDAO {
 
     public int getNextAvailableSlot(ParkingType parkingType){
         Connection con = null;
-        int result=-1;
+        int result = -1;
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_NEXT_PARKING_SPOT);
@@ -37,6 +37,7 @@ public class ParkingSpotDAO {
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
+            return result;
         }catch (Exception ex){ // more like a SQLException ? no ?
             logger.error("Error fetching next available slot",ex);
         }finally {
