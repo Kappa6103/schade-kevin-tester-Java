@@ -37,7 +37,8 @@ public class InteractiveShell {
                     continueApp = false;
                     break;
                 }
-                default: System.out.println("Unsupported option. Please enter a number corresponding to the provided menu");
+                default: System.out.println("Unsupported option. "
+                		+ "Please enter a number corresponding to the provided menu");
             }
         }
     }
@@ -48,5 +49,4 @@ public class InteractiveShell {
         System.out.println("2 Vehicle Exiting - Generate Ticket Price");
         System.out.println("3 Shutdown System");
     }
-
 }

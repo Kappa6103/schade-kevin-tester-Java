@@ -11,15 +11,14 @@ public class FareCalculatorService {
 
     public void calculateFare(Ticket ticket, boolean discount){
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
-            throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
+            throw new IllegalArgumentException(
+            		"Out time provided is incorrect:" + ticket.getOutTime().toString()
+            		);
         }
         long inHour = ticket.getInTime().getTime();
         long outHour = ticket.getOutTime().getTime();
-        //minutes = milliseconds / 60000
         long diffInMilliseconds = outHour - inHour;
-        //duration in hours 1.0 format for 60mins format
         double formatingDuration = (double) ((diffInMilliseconds) / (1000.0 * 60)) / 60;
-        //rounding up to 2 decimal
         double duration = BigDecimal
         		.valueOf(formatingDuration)
         		.setScale(2, RoundingMode.HALF_UP)

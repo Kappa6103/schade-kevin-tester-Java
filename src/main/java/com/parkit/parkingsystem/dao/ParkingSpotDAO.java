@@ -6,19 +6,10 @@ import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
- /*DATA ACCES OBJECT DDB -> OBJ JAVA
- *  It's a very common and fundamental design pattern used to abstract 
- *  and encapsulate all access to the data source of an application.
- *  
- * Think of a DAO as a dedicated component responsible for interacting with your database 
- * (or any other persistent storage mechanism like a file, a web service, etc.)
- * on behalf of other parts of your application.
- */
 public class ParkingSpotDAO {
     private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
 
@@ -33,21 +24,20 @@ public class ParkingSpotDAO {
             ps.setString(1, parkingType.toString());
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
-                result = rs.getInt(1); //removing one comma
+                result = rs.getInt(1);
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
             return result;
-        }catch (Exception ex){ // more like a SQLException ? no ?
+        } catch (Exception ex) {
             logger.error("Error fetching next available slot",ex);
-        }finally {
+        } finally {
             dataBaseConfig.closeConnection(con);
         }
         return result;
     }
 
     public boolean updateParking(ParkingSpot parkingSpot){
-        //update the availability for that parking slot
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
