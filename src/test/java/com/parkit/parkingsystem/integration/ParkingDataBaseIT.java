@@ -122,7 +122,7 @@ public class ParkingDataBaseIT {
     	ticket = ticketDAO.getTicket(vehicleRegNumber);
     	
     	//Assert
-    	BigDecimal ticketWithDiscount = BigDecimal.valueOf(Fare.CAR_RATE_PER_HOUR * Fare.DISCOUNT)
+    	BigDecimal ticketWithDiscount = BigDecimal.valueOf(Fare.CAR_RATE_PER_HALF_HOUR * Fare.DISCOUNT)
     			.setScale(2, RoundingMode.HALF_UP);
     	BigDecimal testTicket = BigDecimal.valueOf(ticket.getPrice())
     			.setScale(2, RoundingMode.HALF_UP);

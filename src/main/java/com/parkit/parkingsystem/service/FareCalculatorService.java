@@ -24,24 +24,26 @@ public class FareCalculatorService {
         		.setScale(2, RoundingMode.HALF_UP)
         		.doubleValue();
         
+        if (duration >= 0.5) {
+        	duration -= 0.5;			
+		} else {
+			duration = 0;
+		}
+        
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
-            	if (duration > 0.5 && !discount) {
+            	if (!discount) {
                     ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
-            	} else if (duration > 0.5 && discount) {
+            	} else if (discount) {
             		ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR * Fare.DISCOUNT);
-            	} else {
-            		ticket.setPrice(0);
             	}
                 break;
             }
             case BIKE: {
-            	if (duration > 0.5 && !discount) {
+            	if (!discount) {
                     ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);
-            	} else if (duration > 0.5 && discount) {
+            	} else if (discount) {
             		ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR * Fare.DISCOUNT);
-            	} else {
-            		ticket.setPrice(0);
             	}
                 break;
             }
