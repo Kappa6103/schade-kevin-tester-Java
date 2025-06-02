@@ -103,7 +103,6 @@ public class ParkingDataBaseIT {
         farePopulated = ticket.getPrice() > 0;
         
         //Assert
-        //TODO: check that the fare generated and out time are populated correctly in the database
         assertNotNull(ticket.getOutTime(), "ticket.getOutTime() asserted not nul");
         assertTrue(farePopulated, "fare asserted > 0");        
     }
