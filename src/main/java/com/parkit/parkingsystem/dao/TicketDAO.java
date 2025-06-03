@@ -23,7 +23,8 @@ public class TicketDAO {
         int numbOfTicket = 0;
         try {
             con = dataBaseConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement(DBConstants.NUMBER_OF_ENTRY_PER_VEHICLE);
+            PreparedStatement ps = con.prepareStatement(
+            		DBConstants.NUMBER_OF_ENTRY_PER_VEHICLE);
             ps.setString(1,vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){

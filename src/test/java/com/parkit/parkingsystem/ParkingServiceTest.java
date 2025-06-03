@@ -115,7 +115,7 @@ public class ParkingServiceTest {
     public void testProcessIncomingVehicle() {
     	//Arrange
     	try {
-			when(mockInputReaderUtil.readSelection()).thenReturn(1); // car
+			when(mockInputReaderUtil.readSelection()).thenReturn(1);
 			when(mockParkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
 			when(mockInputReaderUtil.readVehicleRegistrationNumber()).thenReturn(vehiculeRegNumber);
 			when(mockParkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
@@ -140,6 +140,7 @@ public class ParkingServiceTest {
         ArgumentCaptor<Ticket> ticketCaptor = ArgumentCaptor.forClass(Ticket.class);
         verify(mockTicketDAO).saveTicket(ticketCaptor.capture()); 
         Ticket savedTicket = ticketCaptor.getValue();
+        
         assertEquals(vehiculeRegNumber, savedTicket.getVehicleRegNumber());
         assertEquals(1, savedTicket.getParkingSpot().getId());
         assertEquals(ParkingType.CAR, savedTicket.getParkingSpot().getParkingType());
